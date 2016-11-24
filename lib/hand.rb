@@ -2,6 +2,7 @@ require_relative 'card'
 
 class Hand
   attr_reader :vals, :suits
+  attr_accessor :cards
 
   HIGH = {"Card high"=> 0, "Pair" => 1, "Two pair" => 2, "Three of a kind" => 3,
     "Straight" => 4, "Flush" => 5, "Full house" => 6, "Four of a kind" => 7, "Straight flush" => 8}
@@ -22,16 +23,13 @@ class Hand
 
   def hand_value
     if is_flush?
-      puts "flush"
       return HIGH["Straight flush"] if is_straight?
       return HIGH["Flush"]
     end
 
     if is_straight?
-      puts "straight"
       return HIGH["Straight"]
     end
-    puts "high"
     ace_val
     return HIGH[find_value]
 
@@ -73,8 +71,6 @@ class Hand
 
   def find_value
     count = Hash.new { |h,k| h[k] = 0 }
-    print @vals
-    print @suits
     @vals.each do |val|
       count[val] = @vals.count(val) if @vals.count(val) > 1
     end
@@ -96,18 +92,57 @@ class Hand
   end
 
   def beats_hand(*hands)
-    hand_values = Hash.new { |h,k| h[k] = 0 }
-    hands.each_with_index do |hand, index|
-      hand_values[hand] = [hand.hand_value, index]
+    hand_val_arr = [self.hand_value]
+    hands.each do |hand|
+      hand_val_arr << hand.hand_value
     end
-
-    max = hand_values.values.map { |value| value.take(1) }.max
-    ties = []
-    hand_values.each do |h, k|
-
-
-
+    max = -1
+    winning_idx = nil
+    winner = 0
+    hand_val_arr.each_with_index do |val, idx|
+      if val > max
+        max = val
+        winning_idx = idx
+        winner = 0
+      elsif val == max
+        if winning_idx == 0
+          winner = tie_breaker(self, hands[idx-1])
+          if winner == hands[idx-1]
+            max = val
+            winning_idx = idx
+          end
+        else
+          winner = tie_breaker(hands[winning_idx-1], hands[idx-1])
+          if winner = hands[idx-1]
+            max = val
+            winning_idx = idx
+          end
+        end
+      end
     end
+    return "No winner!!" if winner == -1
+    return winning_idx == 0 ? self : hands[winning_idx-1]
   end
 
+  def tie_breaker(hand1, hand2)
+    rem_cards1 = hand1.vals.sort.dup
+    rem_cards2 = hand2.vals.sort.dup
+    loop do
+      card1 = rem_cards1.pop
+      card2 = rem_cards2.pop
+      if card1 > card2
+        return hand1
+      elsif card2 > card1
+        return hand2
+      end
+      break if rem_cards1.empty? # || rem_cards2.empty?
+    end
+    return -1
+  end
+
+  def inspect
+    cards.each do |card|
+      print "#{card.face_value}: #{card.suit}"
+    end
+  end
 end

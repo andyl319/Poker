@@ -3,7 +3,7 @@ require 'hand'
 describe Hand do
   let(:hand) { Hand.new([Card.new(1, "Hearts"), Card.new(2, "Hearts"), Card.new(3, "Hearts"),
     Card.new(4, "Hearts"), Card.new(5, "Hearts")]) }
-  let(:hand2) { Hand.new([Card.new(8, "Hearts"), Card.new(2, "Hearts"), Card.new(3, "Hearts"),
+  let(:hand2) { Hand.new([Card.new(1, "Hearts"), Card.new(2, "Hearts"), Card.new(3, "Hearts"),
     Card.new(4, "Hearts"), Card.new(5, "Hearts")]) }
   let(:hand3) { Hand.new([Card.new(1, "Hearts"), Card.new(2, "Hearts"), Card.new(3, "Hearts"),
     Card.new(4, "Spades"), Card.new(5, "Hearts")]) }
@@ -22,8 +22,8 @@ describe Hand do
     it "Finds the straight flush" do
       expect(hand.hand_value).to eq(8)
     end
-    it "Finds a regular flush" do 
-      expect(hand2.hand_value).to eq(5)
+    it "Finds a regular flush" do
+      expect(hand2.hand_value).to eq(8)
     end
     it "Finds a straight" do
       expect(hand3.hand_value).to eq(4)
@@ -34,5 +34,12 @@ describe Hand do
     it "Finds a two pair" do
       expect(hand5.hand_value).to eq(2)
     end
+  end
+
+  describe "#beats_hand" do
+    it "Find the winning hand" do
+      expect(hand.beats_hand(hand2, hand3, hand4, hand5)).to eq("No winner!!")
+    end
+
   end
 end

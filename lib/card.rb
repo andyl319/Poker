@@ -6,4 +6,12 @@ class Card
     @suit = suit
   end
 
+  def inspect
+    print "#{card.face_value}: #{card.suit}"
+  end
+
+  
+  def to_s
+    print "#{card.face_value}: #{card.suit}"
+  end
 end
